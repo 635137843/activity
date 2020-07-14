@@ -1,0 +1,24 @@
+# 服务配置
+server:
+  display-name: actdemo
+  port: 8085
+
+# Spring相关配置
+spring:
+  ##数据库连接信息
+  datasource:
+    # 数据源配置
+    url: jdbc:mysql://localhost:3306/activity?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&nullCatalogMeansCurrent=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  application:
+    # 注册应用名
+    name: actdemo
+  activiti:
+    # 自动建表
+    database-schema: activity
+    database-schema-update: true
+    history-level: full
+    db-history-used: true
