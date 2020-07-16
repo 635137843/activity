@@ -1,9 +1,11 @@
 package com.activity.demo.test;
 
 import com.activity.demo.config.SecurityUtil;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -46,6 +48,8 @@ public class Demo {
     @Autowired
     private RepositoryService repositoryService;
 
+    @Autowired
+    private HistoryService historyService;
     //流程定义信息的查看
     @Test
     public void testDefinition(){
@@ -60,6 +64,7 @@ public class Demo {
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
         List<ProcessDefinition> list = processDefinitionQuery
                 .orderByProcessDefinitionVersion().desc().list();
+        //repositoryService.deleteDeployment("2");
         for (int i=0;i<list.size();i++){
             ProcessDefinition processDefinition = list.get(i);
             System.out.println("流程定义id：" + processDefinition.getId());
@@ -127,5 +132,15 @@ public class Demo {
             System.out.println ("执行对象ID:" + task.getExecutionId ());
             System.out.println ("流程定义ID:" + task.getProcessDefinitionId ());
         }
+    }
+
+    @Test
+    public void queryHistoryData(){
+        List<HistoricActivityInstance> demo = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId("5b179294-c67b-11ea-bddc-00ff0a0d866d")
+                .orderByHistoricActivityInstanceStartTime()
+                .asc()
+                .list();
+        demo.stream().forEach(System.out::println);
     }
 }
