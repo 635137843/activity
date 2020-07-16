@@ -1,13 +1,11 @@
 package com.activity.demo.test;
 
 import com.activity.demo.config.SecurityUtil;
-import org.activiti.api.process.model.ProcessDefinition;
-import org.activiti.api.process.runtime.ProcessRuntime;
-import org.activiti.api.runtime.shared.query.Page;
-import org.activiti.api.runtime.shared.query.Pageable;
-import org.activiti.api.task.runtime.TaskRuntime;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.junit.Test;
@@ -35,11 +33,6 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class Demo {
-    @Autowired
-    private ProcessRuntime processRuntime; //实现流程定义相关操作
-
-    @Autowired
-    private TaskRuntime taskRuntime; //实现任务相关操作
 
     @Autowired
     private SecurityUtil securityUtil;//SpringSecurity相关的工具类
@@ -50,16 +43,30 @@ public class Demo {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private RepositoryService repositoryService;
+
     //流程定义信息的查看
     @Test
     public void testDefinition(){
         securityUtil.logInAs("salaboy");//SpringSecurity认证
-        //分页查询出流程定义信息
+        /*//分页查询出流程定义信息
         Page<ProcessDefinition> processDefinitionPage = processRuntime
                 .processDefinitions(Pageable.of(0, 10));
         System.out.println("可用的流程定义数量：" + processDefinitionPage.getTotalItems());//查看已部署的流程个数
         for (ProcessDefinition pd : processDefinitionPage.getContent()) {
             System.out.println("流程定义：" + pd);
+        }*/
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
+        List<ProcessDefinition> list = processDefinitionQuery
+                .orderByProcessDefinitionVersion().desc().list();
+        for (int i=0;i<list.size();i++){
+            ProcessDefinition processDefinition = list.get(i);
+            System.out.println("流程定义id：" + processDefinition.getId());
+            System.out.println("流程定义名称：" + processDefinition.getName());
+            System.out.println("流程定义key：" + processDefinition.getKey());
+            System.out.println("流程定义版本：" + processDefinition.getVersion());
+            System.out.println("流程部署id：" + processDefinition.getDeploymentId());
         }
     }
 
@@ -68,23 +75,15 @@ public class Demo {
      */
     @Test
     public void testStartProcess() {
-//        securityUtil.logInAs("salaboy");
-//        ProcessInstance pi = processRuntime.start(ProcessPayloadBuilder
-//                .start()
-//                .withProcessDefinitionKey("myProcess_1")
-//                .build());//启动流程实例
-//        System.out.println("流程实例ID：" + pi.getId());
-        String processDefinitionKey = "myProcess_1";
+        securityUtil.logInAs("salaboy");
+
+        String processDefinitionKey = "demo";
         Map<String, Object> map = new HashMap<>();
 
         //使用UEL 表达式设置
 
-        // 学生填写申请单    Assignee：${student}
         map.put ("test1", "salaboy");
 
-        // 班主任审批    Assignee：${teacher}
-        map.put ("test2", "ryandawsonuk");
-        map.put ("test3", "erdemedeiros");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, map);
         System.out.println ("流程实例ID:" + processInstance.getId ());
@@ -98,14 +97,28 @@ public class Demo {
     public void testTask() {
         List<Task> test01 = taskService.createTaskQuery()
                 //流程实例key
-                .processDefinitionKey("myProcess_1")
+                .processDefinitionKey("demo")
                 //查询谁的任务
                 //.taskAssignee("salaboy")
                 .list();
         List<String> idList = new ArrayList<String>();
 
+        Map<String, Object> map = new HashMap<>();
+
+        //使用UEL 表达式设置
+
+        map.put ("test2", "ryandawsonuk");
+
         for (Task task : test01) {
             idList.add (task.getId ());
+            //完成任务
+            //taskService.complete(task.getId(), map);
+            //分派
+            //taskService.delegateTask(task.getId(), "other");
+            //taskService.resolveTask(task.getId());
+            //移交
+            //taskService.setAssignee(task.getId(),"other");
+
             System.out.println ("任务ID:" + task.getId ());
             System.out.println ("任务名称:" + task.getName ());
             System.out.println ("任务的创建时间:" + task.getCreateTime ());
