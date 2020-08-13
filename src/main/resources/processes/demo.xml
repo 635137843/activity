@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.activiti.org/testm1594733949402" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" expressionLanguage="http://www.w3.org/1999/XPath" id="m1594733949402" name="" targetNamespace="http://www.activiti.org/testm1594733949402" typeLanguage="http://www.w3.org/2001/XMLSchema">
   <process id="demo" isClosed="false" isExecutable="true" name="测试" processType="None">
     <startEvent id="_2" name="StartEvent"/>
-    <userTask activiti:assignee="${test1}" activiti:exclusive="true" id="_3" name="建单人"/>
+    <userTask activiti:assignee="${holiday.applyName}" activiti:exclusive="true" id="_3" name="建单人"/>
     <userTask activiti:assignee="${test2}" activiti:exclusive="true" id="_4" name="省端确认"/>
     <userTask activiti:assignee="${test3}" activiti:exclusive="true" id="_5" name="总部确认"/>
     <endEvent id="_6" name="EndEvent"/>

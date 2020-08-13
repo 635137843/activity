@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0ubpcum" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
+  <bpmn:process id="demo2" name="importantFailure" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="开始" camunda:asyncAfter="true">
+      <bpmn:outgoing>SequenceFlow_0seuw7z</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="failureConfirm" name="故障发生确认" camunda:asyncAfter="true" camunda:assignee="${holiday.applyName}">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule" />
+          <camunda:property name="_dispatchTo" value="[{&#34;id&#34;:&#34;99&#34;,&#34;name&#34;:&#34;人工质检组&#34;,&#34;fullName&#34;:&#34;人工质检组&#34;,&#34;fullCode&#34;:&#34;quality_testing&#34;,&#34;type&#34;:&#34;team&#34;}]" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zrw47l</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_10t7849</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q5cjs7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0rihnpo" name="是否驳回" default="Flow_1qyaowg">
+      <bpmn:incoming>Flow_0q5cjs7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qyaowg</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1krr7jf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0q5cjs7" sourceRef="failureConfirm" targetRef="Gateway_0rihnpo" />
+    <bpmn:sequenceFlow id="Flow_1qyaowg" sourceRef="Gateway_0rihnpo" targetRef="failureHandle" />
+    <bpmn:sequenceFlow id="Flow_1krr7jf" name="是" sourceRef="Gateway_0rihnpo" targetRef="draft">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('isRefuse')== '1'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0zrw47l" sourceRef="draft" targetRef="failureConfirm" />
+    <bpmn:userTask id="draft" name="草稿" camunda:assignee="${createNetuserid}">
+      <bpmn:incoming>Flow_1krr7jf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zrw47l</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="failureHandle" name="故障处理" camunda:asyncAfter="true" camunda:assignee="${createNetuserid}">
+      <bpmn:incoming>Flow_1qyaowg</bpmn:incoming>
+      <bpmn:incoming>Flow_0iwtul0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0szte3d</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0szte3d" sourceRef="failureHandle" targetRef="clearFailureConfirm" />
+    <bpmn:userTask id="clearFailureConfirm" name="消障确认">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0szte3d</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0bp3qoe</bpmn:incoming>
+      <bpmn:outgoing>Flow_0oo56bm</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0feoj3l" name="是否驳回" default="Flow_1wure18">
+      <bpmn:incoming>Flow_0oo56bm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wure18</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0iwtul0</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0oo56bm" sourceRef="clearFailureConfirm" targetRef="Gateway_0feoj3l" />
+    <bpmn:sequenceFlow id="Flow_1wure18" sourceRef="Gateway_0feoj3l" targetRef="Gateway_1vf94re" />
+    <bpmn:parallelGateway id="Gateway_1vf94re">
+      <bpmn:incoming>Flow_1wure18</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uyxvx3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1gfvakj</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0uyxvx3" sourceRef="Gateway_1vf94re" targetRef="failurePreSummaryPro" />
+    <bpmn:userTask id="failurePreSummaryPro" name="故障初步总结" camunda:assignee="${createNetuserid}">
+      <bpmn:incoming>Flow_0uyxvx3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dha91u</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1gfvakj" sourceRef="Gateway_1vf94re" targetRef="failurePreSummaryZb" />
+    <bpmn:sequenceFlow id="Flow_1dha91u" sourceRef="failurePreSummaryPro" targetRef="Gateway_1yxhtil" />
+    <bpmn:sequenceFlow id="Flow_0xp3gkt" sourceRef="failurePreSummaryZb" targetRef="Gateway_1yxhtil" />
+    <bpmn:parallelGateway id="Gateway_1yxhtil">
+      <bpmn:incoming>Flow_1dha91u</bpmn:incoming>
+      <bpmn:incoming>Flow_0xp3gkt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vu7epl</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0iwtul0" name="是" sourceRef="Gateway_0feoj3l" targetRef="failureHandle">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('isRefuse')== '1'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0vu7epl" sourceRef="Gateway_1yxhtil" targetRef="failurePreReport" />
+    <bpmn:userTask id="failurePreReport" name="故障报告初稿">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule3" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0vu7epl</bpmn:incoming>
+      <bpmn:incoming>Flow_1airl27</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cj1aww</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1cj1aww" sourceRef="failurePreReport" targetRef="failureReportPreAudit" />
+    <bpmn:exclusiveGateway id="Gateway_06wr7v1" name="初审是否驳回" default="Flow_0kad5pc">
+      <bpmn:incoming>Flow_0mqt22c</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kad5pc</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1airl27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0mqt22c" sourceRef="failureReportPreAudit" targetRef="Gateway_06wr7v1" />
+    <bpmn:sequenceFlow id="Flow_0kad5pc" sourceRef="Gateway_06wr7v1" targetRef="failureReportReviewAudit" />
+    <bpmn:userTask id="failureReportPreAudit" name="故障报告初审">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule4" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1cj1aww</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1ca2rc0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mqt22c</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="failureReportReviewAudit" name="故障报告复审">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule3" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kad5pc</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0v7cwmu</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1airl27" name="驳回" sourceRef="Gateway_06wr7v1" targetRef="failurePreReport">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('isRefuse')== '1'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0w0yv4m" name="复审是否通过" default="SequenceFlow_1eibg30">
+      <bpmn:incoming>SequenceFlow_0v7cwmu</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ca2rc0</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1eibg30</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0v7cwmu" sourceRef="failureReportReviewAudit" targetRef="ExclusiveGateway_0w0yv4m" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ca2rc0" name="复审不通过" sourceRef="ExclusiveGateway_0w0yv4m" targetRef="failureReportPreAudit">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('isRefuse')== '1'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_0xykrjq">
+      <bpmn:incoming>SequenceFlow_1eibg30</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1eibg30" sourceRef="ExclusiveGateway_0w0yv4m" targetRef="EndEvent_0xykrjq" />
+    <bpmn:userTask id="failurePreSummaryZb" name="故障初步总结">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="dmn_key" value="importantFailureRule" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1gfvakj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xp3gkt</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_06iuefs" name="是否事中上报" default="SequenceFlow_0bp3qoe">
+      <bpmn:incoming>SequenceFlow_0seuw7z</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_10t7849</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0bp3qoe</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0seuw7z" sourceRef="StartEvent_1" targetRef="ExclusiveGateway_06iuefs" />
+    <bpmn:sequenceFlow id="SequenceFlow_10t7849" name="是" sourceRef="ExclusiveGateway_06iuefs" targetRef="failureConfirm">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('extMap').isFaultEliminated== '0'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0bp3qoe" sourceRef="ExclusiveGateway_06iuefs" targetRef="clearFailureConfirm" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_04zfgyk">
+      <bpmndi:BPMNEdge id="SequenceFlow_0bp3qoe_di" bpmnElement="SequenceFlow_0bp3qoe">
+        <di:waypoint x="255" y="222" />
+        <di:waypoint x="255" y="88" />
+        <di:waypoint x="787" y="88" />
+        <di:waypoint x="787" y="207" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_10t7849_di" bpmnElement="SequenceFlow_10t7849">
+        <di:waypoint x="280" y="247" />
+        <di:waypoint x="337" y="247" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="303" y="229" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0seuw7z_di" bpmnElement="SequenceFlow_0seuw7z">
+        <di:waypoint x="192" y="247" />
+        <di:waypoint x="230" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1eibg30_di" bpmnElement="SequenceFlow_1eibg30">
+        <di:waypoint x="1872" y="247" />
+        <di:waypoint x="1917" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ca2rc0_di" bpmnElement="SequenceFlow_1ca2rc0">
+        <di:waypoint x="1847" y="222" />
+        <di:waypoint x="1847" y="118" />
+        <di:waypoint x="1497" y="118" />
+        <di:waypoint x="1497" y="207" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1645" y="100" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0v7cwmu_di" bpmnElement="SequenceFlow_0v7cwmu">
+        <di:waypoint x="1777" y="247" />
+        <di:waypoint x="1822" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1airl27_di" bpmnElement="Flow_1airl27">
+        <di:waypoint x="1607" y="272" />
+        <di:waypoint x="1607" y="410" />
+        <di:waypoint x="1347" y="410" />
+        <di:waypoint x="1347" y="287" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1467" y="392" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kad5pc_di" bpmnElement="Flow_0kad5pc">
+        <di:waypoint x="1632" y="247" />
+        <di:waypoint x="1677" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mqt22c_di" bpmnElement="Flow_0mqt22c">
+        <di:waypoint x="1547" y="247" />
+        <di:waypoint x="1582" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cj1aww_di" bpmnElement="Flow_1cj1aww">
+        <di:waypoint x="1397" y="247" />
+        <di:waypoint x="1447" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vu7epl_di" bpmnElement="Flow_0vu7epl">
+        <di:waypoint x="1242" y="247" />
+        <di:waypoint x="1297" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0iwtul0_di" bpmnElement="Flow_0iwtul0">
+        <di:waypoint x="897" y="272" />
+        <di:waypoint x="897" y="430" />
+        <di:waypoint x="647" y="430" />
+        <di:waypoint x="647" y="287" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="767" y="412" width="11" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xp3gkt_di" bpmnElement="Flow_0xp3gkt">
+        <di:waypoint x="1147" y="360" />
+        <di:waypoint x="1217" y="360" />
+        <di:waypoint x="1217" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dha91u_di" bpmnElement="Flow_1dha91u">
+        <di:waypoint x="1147" y="120" />
+        <di:waypoint x="1217" y="120" />
+        <di:waypoint x="1217" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gfvakj_di" bpmnElement="Flow_1gfvakj">
+        <di:waypoint x="987" y="272" />
+        <di:waypoint x="987" y="360" />
+        <di:waypoint x="1047" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uyxvx3_di" bpmnElement="Flow_0uyxvx3">
+        <di:waypoint x="987" y="222" />
+        <di:waypoint x="987" y="120" />
+        <di:waypoint x="1047" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wure18_di" bpmnElement="Flow_1wure18">
+        <di:waypoint x="922" y="247" />
+        <di:waypoint x="962" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oo56bm_di" bpmnElement="Flow_0oo56bm">
+        <di:waypoint x="837" y="247" />
+        <di:waypoint x="872" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0szte3d_di" bpmnElement="Flow_0szte3d">
+        <di:waypoint x="697" y="247" />
+        <di:waypoint x="737" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zrw47l_di" bpmnElement="Flow_0zrw47l">
+        <di:waypoint x="467" y="390" />
+        <di:waypoint x="387" y="390" />
+        <di:waypoint x="387" y="287" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1krr7jf_di" bpmnElement="Flow_1krr7jf">
+        <di:waypoint x="517" y="272" />
+        <di:waypoint x="517" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="527" y="308" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qyaowg_di" bpmnElement="Flow_1qyaowg">
+        <di:waypoint x="542" y="247" />
+        <di:waypoint x="597" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q5cjs7_di" bpmnElement="Flow_0q5cjs7">
+        <di:waypoint x="437" y="247" />
+        <di:waypoint x="492" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="156" y="229" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="163" y="272" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08qv2yl_di" bpmnElement="failureConfirm">
+        <dc:Bounds x="337" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0rihnpo_di" bpmnElement="Gateway_0rihnpo" isMarkerVisible="true">
+        <dc:Bounds x="492" y="222" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="496" y="192" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vqs8x8_di" bpmnElement="draft">
+        <dc:Bounds x="467" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dkoe8e_di" bpmnElement="failureHandle">
+        <dc:Bounds x="597" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lj5sx9_di" bpmnElement="clearFailureConfirm">
+        <dc:Bounds x="737" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0feoj3l_di" bpmnElement="Gateway_0feoj3l" isMarkerVisible="true">
+        <dc:Bounds x="872" y="222" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="876" y="192" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0qsjl4j_di" bpmnElement="Gateway_1vf94re">
+        <dc:Bounds x="962" y="222" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xok0f9_di" bpmnElement="failurePreSummaryPro">
+        <dc:Bounds x="1047" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1epbhmt_di" bpmnElement="Gateway_1yxhtil">
+        <dc:Bounds x="1192" y="222" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1622dz5_di" bpmnElement="failurePreReport">
+        <dc:Bounds x="1297" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_06wr7v1_di" bpmnElement="Gateway_06wr7v1" isMarkerVisible="true">
+        <dc:Bounds x="1582" y="222" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1575" y="192" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0mpcfvt_di" bpmnElement="failureReportPreAudit">
+        <dc:Bounds x="1447" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12cv8j2_di" bpmnElement="failureReportReviewAudit">
+        <dc:Bounds x="1677" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0w0yv4m_di" bpmnElement="ExclusiveGateway_0w0yv4m" isMarkerVisible="true">
+        <dc:Bounds x="1822" y="222" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1814" y="279" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0xykrjq_di" bpmnElement="EndEvent_0xykrjq">
+        <dc:Bounds x="1917" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1cbsy11_di" bpmnElement="failurePreSummaryZb">
+        <dc:Bounds x="1047" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_06iuefs_di" bpmnElement="ExclusiveGateway_06iuefs" isMarkerVisible="true">
+        <dc:Bounds x="230" y="222" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="222" y="279" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,5 +1,6 @@
 package com.activity.demo.test;
 
+import com.activity.demo.config.Holiday;
 import com.activity.demo.config.SecurityUtil;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -82,12 +83,15 @@ public class Demo {
     public void testStartProcess() {
         securityUtil.logInAs("salaboy");
 
-        String processDefinitionKey = "demo";
+        String processDefinitionKey = "demo2";
+        Holiday holiday = new Holiday();
+        holiday.setApplyName("test1");
+        holiday.setManagerName("test2");
         Map<String, Object> map = new HashMap<>();
 
         //使用UEL 表达式设置
 
-        map.put ("test1", "salaboy");
+        map.put ("holiday", holiday);
 
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, map);
